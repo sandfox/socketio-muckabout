@@ -1,0 +1,97 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<style>
+			body {
+				height: 100%;
+				width: 100%;
+				background-color: rgba(0,0,0,0.2);
+			}
+			span {
+				position: absolute;
+				display: block;
+				width: 50px;
+				height: 50px;
+			}
+			
+		</style>
+		
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			
+			var id = Math.floor(Math.random() * 300);
+		  var socket = io.connect('http://10.100.132.225/');
+		  socket.on('news', function (data) {
+			alert(data.hello);
+			//socket.emit('my other event', { my: 'data' });
+			//window.box.innerHTML = data;
+		  });
+		  socket.on('bcast', function (data) {
+			  alert(data.msg);
+		  });
+		
+			socket.on('positionupdate', function (data) {
+				update(data);
+			});
+			
+			
+		var update = function(data) {
+			var appendTo = document.getElementById('scores'),
+					span = document.getElementById(data.id) || document.createElement('span');
+				
+				span.id = data.id;
+				
+				span.style.top = data.y + 'px';
+				span.style.left = data.x + 'px';
+				
+				
+				span.textContent = data.x + ', ' + data.y;
+				
+				if(!document.getElementById(data.id)) {
+					span.style.backgroundColor = 'rgb(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ','  + Math.floor(Math.random() * 255) +  ')';
+					appendTo.appendChild(span);
+				}
+		}
+		
+		  var me = function(e){
+				update({x:e.pageX, y:e.pageY, id:id});
+				socket.emit('pos', {x:e.pageX, y:e.pageY, id:id});
+			 }
+		/*
+		 var me = function(e){
+				alert(e.pageX);
+			 }
+		 */
+		   
+		</script>
+		
+	</head>
+	<body>
+		
+		<script>
+			document.addEventListener("mousemove", function(e) {me(e)}, false);
+			document.addEventListener("touchmove", function(e) {e.preventDefault(); me(e)}, false);
+			//document.body.addEventListener("mousemove", function(e) {alert(e.pageX)});
+		</script>
+		
+		
+		<div id="box">A DIV</div>
+		<div id="scores">
+			
+		</div>
+		
+		
+		<!--<p id="clicky" onclick="socket.emit('broadcast', { my: 'dave'});">CLICK ME</p>-->
+		
+		<script>
+			
+		</script>
+	</body>
+</html>
